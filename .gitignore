@@ -1,0 +1,20 @@
+﻿# ambiente virtual
+.venv/
+
+# segredos
+.env
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# dbt
+target/
+dbt_packages/
+logs/
+
+# dados (baixados via script, não versionados)
+data/raw/
+*.csv
+*.duckdb

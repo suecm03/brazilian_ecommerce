@@ -1,0 +1,7 @@
+dbt-duckdb
+pandas
+jupyterlab
+matplotlib
+seaborn
+pytest
+python-dotenv

@@ -10,6 +10,7 @@ erDiagram
         int order_item_id PK
         string product_id FK
         string seller_id FK
+        timestamp shipping_limit_date
         float price
         float freight_value
     }
@@ -54,8 +55,8 @@ erDiagram
     PRODUCTS {
         string product_id PK
         string product_category_name
-        int product_name_lenght
-        int product_description_lenght
+        int product_name_length
+        int product_description_length
         int product_photos_qty
         float product_weight_g
         float product_length_cm

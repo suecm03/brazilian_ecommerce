@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: customers
+      - name: geolocation
+        description: "Não utilizada no modelo — ver README, seção Modelo de Dados."
+      - name: orders
+      - name: order_items
+      - name: payments
+      - name: reviews
+      - name: products
+      - name: sellers
+      - name: product_category_name_translation
+        description: "Não utilizada no modelo — ver README, seção Modelo de Dados."
+  

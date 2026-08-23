@@ -19,6 +19,8 @@ data/raw/
 *.csv
 *.duckdb
 
+.user.yml
+
 contexto_conversa.txt
 docs/case_analista_bi.pdf
 notebooks/exploration.ipynb

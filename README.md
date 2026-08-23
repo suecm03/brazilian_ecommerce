@@ -1,6 +1,6 @@
 ﻿# Brazilian E-Commerce - Analytics Engineer Case
 
-Projeto de analytics engineering ponta a ponta usando o dataset público de e-commerce brasileiro da Olist, para responder à pergunta feita pelo CEO: quais são as alavancas mais efetivas para aumentar a receita nos próximos 6 meses. O projeto cobre modelagem de dados, qualidade de dados, um pipeline ETL/ELT reprodutível, análise exploratória, automação com IA e uma recomendação executiva.
+Projeto de analytics engineering ponta a ponta usando o dataset público de e-commerce brasileiro da Olist, para entender quais são as alavancas mais efetivas para aumentar a receita nos próximos 6 meses. O projeto cobre modelagem de dados, qualidade de dados, um pipeline ETL/ELT reprodutível, análise exploratória, automação com IA e uma recomendação executiva.
 
 ## Escopo do Projeto
 
@@ -63,7 +63,7 @@ O pipeline roda localmente, sem servidor de banco de dados nem infraestrutura ex
 
 O projeto usa o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), com dados relacionais de um marketplace brasileiro.
 
-O dataset deve ser baixado manualmente do Kaggle e extraído em `data/raw/` (os arquivos brutos não são versionados). O download manual foi escolhido em vez da API do Kaggle para manter o setup simples e não depender de credencial pessoal de API — consistente com o pragmatismo do projeto.
+O dataset deve ser baixado manualmente do Kaggle e extraído em `data/raw/` (os arquivos brutos não são versionados). O download manual foi escolhido em vez da API do Kaggle para manter o setup simples e não depender de credencial pessoal de API.
 
 ## Modelo de Dados
 
@@ -72,7 +72,7 @@ O modelo utiliza star schema, na variante conhecida como constelação de fatos 
 **Tabelas fato:**
 - `order_items` — grão de item de pedido; medidas `price` e `freight_value`
 - `payments` — grão de método de pagamento por pedido; medida `payment_value`
-- `reviews` — grão de avaliação; preserva o texto do comentário para a etapa de IA
+- `reviews` — grão de avaliação
 
 **Dimensões:** `customers`, `products`, `sellers`, `orders`.
 
@@ -82,13 +82,13 @@ O ERD completo, com todas as colunas, cardinalidades e chaves compostas, está e
 
 ## Decisões-Chave
 
-- **Constelação de fatos, não um fato único:** existe mais de um processo de negócio mensurável (venda de item, pagamento), cada um com sua própria medida — forçar tudo em uma única tabela fato perderia granularidade real.
+- **Constelação de fatos, não um fato único:** existe mais de um processo de negócio mensurável (venda de item, pagamento), cada um com sua própria medida.
 - **`order_items` contém apenas itens reais:** pedidos sem item (majoritariamente cancelados ou indisponíveis) não geram linha nessa tabela. A tabela `orders` é a fonte completa para qualquer pergunta sobre todos os pedidos.
 - **`customer_unique_id` para análises de cliente, `customer_id` para o grão da dimensão:** o endereço do cliente muda entre pedidos, então a dimensão `customers` é mantida no grão de `customer_id`; `customer_unique_id` é preservado como coluna para identificar recorrência (CLV, recompra).
 - **Receita definida na camada de análise, não no pipeline:** apenas pedidos `delivered` contam como receita; os demais status permanecem nos dados para auditoria ou uma definição alternativa.
-- **`payments` e `reviews` mantidas na granularidade original:** preservar o detalhe de pagamento e o texto das reviews é necessário para a etapa de automação com IA.
+- **`payments` e `reviews` mantidas na granularidade original:** preservar o detalhe de pagamento e o texto das reviews é necessário para análises mais qualitativas, como de análise de sentimento.
 - **DuckDB e dbt em vez de um banco com servidor:** roda localmente a partir de um arquivo, sem infraestrutura ou configuração adicional, adequado ao prazo do case.
-- **Geolocalização e tradução de categoria fora do modelo:** `customers` e `sellers` já trazem cidade e estado; a tradução de categoria não é necessária para o público interno da análise.
+- **Geolocalização e tradução de categoria fora do modelo:** `customers` e `sellers` já trazem cidade e estado; a tradução de categoria não é necessária para o público da análise.
 
 ## Qualidade de Dados
 

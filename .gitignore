@@ -18,3 +18,5 @@ logs/
 data/raw/
 *.csv
 *.duckdb
+
+contexto_conversa.txt

@@ -1,0 +1,161 @@
+version: 2
+
+models:
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        tests:
+          - not_null
+      - name: customer_state
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO']
+
+  - name: dim_sellers
+    columns:
+      - name: seller_id
+        tests:
+          - unique
+          - not_null
+      - name: seller_state
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO']
+
+  - name: dim_products
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['delivered','shipped','canceled','unavailable','invoiced','processing','created','approved']
+      - name: order_approved_at
+        tests:
+          - after_column:
+              arguments:
+                reference_column: order_purchase_timestamp
+              config:
+                severity: warn
+      - name: order_delivered_carrier_date
+        tests:
+          - after_column:
+              arguments:
+                reference_column: order_approved_at
+              config:
+                severity: warn
+      - name: order_delivered_customer_date
+        tests:
+          - after_column:
+              arguments:
+                reference_column: order_purchase_timestamp
+          - after_column:
+              arguments:
+                reference_column: order_delivered_carrier_date
+              config:
+                severity: warn
+
+  - name: fct_order_items
+    tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['order_id', 'order_item_id']
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_orders')
+                field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+      - name: seller_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sellers')
+                field: seller_id
+      - name: price
+        tests:
+          - not_null
+          - non_negative
+      - name: freight_value
+        tests:
+          - not_null
+          - non_negative
+
+  - name: fct_payments
+    tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['order_id', 'payment_sequential']
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_orders')
+                field: order_id
+      - name: payment_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['credit_card','boleto','voucher','debit_card','not_defined']
+      - name: payment_value
+        tests:
+          - non_negative
+
+  - name: fct_reviews
+    tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['review_id', 'order_id']
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_orders')
+                field: order_id
+      - name: review_score
+        tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+      - name: review_answer_timestamp
+        tests:
+          - after_column:
+              arguments:
+                reference_column: review_creation_date

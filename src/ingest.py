@@ -18,6 +18,7 @@ TABLES = {
 
 
 def ingest(raw_data_dir: Path = RAW_DATA_DIR, db_path: Path = DB_PATH) -> None:
+    """Carrega os CSVs brutos em tabelas no DuckDB."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = duckdb.connect(str(db_path))
 

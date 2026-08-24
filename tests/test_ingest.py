@@ -1,16 +1,20 @@
-﻿import duckdb
+from pathlib import Path
+
+import duckdb
 
 from src.ingest import ingest, TABLES
 
 
-def test_ingest_creates_db_file(tmp_path):
+def test_ingest_creates_db_file(tmp_path: Path) -> None:
+    """Confere se o arquivo do banco é criado após a ingestão."""
     db_path = tmp_path / "test.duckdb"
 
     ingest(db_path=db_path)
 
     assert db_path.exists()
 
-def test_ingest_creates_all_tables(tmp_path):
+def test_ingest_creates_all_tables(tmp_path: Path) -> None:
+    """Confere se todas as tabelas esperadas foram criadas."""
     db_path = tmp_path / "test.duckdb"
 
     ingest(db_path=db_path)
@@ -21,7 +25,8 @@ def test_ingest_creates_all_tables(tmp_path):
 
     assert set(TABLES.keys()) == existing_tables
 
-def test_ingest_tables_have_rows(tmp_path):
+def test_ingest_tables_have_rows(tmp_path: Path) -> None:
+    """Confere se nenhuma tabela criada está vazia."""
     db_path = tmp_path / "test.duckdb"
 
     ingest(db_path=db_path)

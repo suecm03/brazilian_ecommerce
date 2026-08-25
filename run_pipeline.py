@@ -7,9 +7,10 @@ from subprocess import run
 PROJECT_ROOT = Path(__file__).resolve().parent
 DBT_PROJECT_DIR = PROJECT_ROOT / "dbt_project"
 VENV_SCRIPTS = Path(sys.executable).parent
+EXE_SUFFIX = ".exe" if sys.platform == "win32" else ""
 
-DBT_EXECUTABLE = VENV_SCRIPTS / "dbt.exe"
-JUPYTER_EXECUTABLE = VENV_SCRIPTS / "jupyter.exe"
+DBT_EXECUTABLE = VENV_SCRIPTS / f"dbt{EXE_SUFFIX}"
+JUPYTER_EXECUTABLE = VENV_SCRIPTS / f"jupyter{EXE_SUFFIX}"
 
 
 def rodar(comando: list[str], nome: str, cwd: Path = PROJECT_ROOT) -> None:

@@ -15,7 +15,6 @@ dbt_packages/
 logs/
 
 # dados (baixados ou gerados via script, não versionados)
-data/raw/
 *.csv
 *.duckdb
 *.parquet

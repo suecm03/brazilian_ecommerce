@@ -103,7 +103,7 @@ Criação do ambiente virtual e instalação das dependências:
 
 ```bash
 python -m venv .venv
-source .venv/Scripts/activate  # Git Bash no Windows
+source .venv/Scripts/activate  # Git Bash no Windows (Powershell: ".venv\scripts\Activate")
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 ```

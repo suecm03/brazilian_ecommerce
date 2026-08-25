@@ -14,13 +14,12 @@ target/
 dbt_packages/
 logs/
 
-# dados (baixados via script, não versionados)
+# dados (baixados ou gerados via script, não versionados)
 data/raw/
 *.csv
 *.duckdb
+*.parquet
 
 .user.yml
 
-contexto_conversa.txt
-docs/case_analista_bi.pdf
 notebooks/exploration.ipynb

@@ -29,7 +29,7 @@ erDiagram
         int review_score
         string review_comment_title
         string review_comment_message
-        date review_creation_date
+        timestamp review_creation_date
         timestamp review_answer_timestamp
     }
 
@@ -41,7 +41,7 @@ erDiagram
         timestamp order_approved_at
         timestamp order_delivered_carrier_date
         timestamp order_delivered_customer_date
-        date order_estimated_delivery_date
+        timestamp order_estimated_delivery_date
     }
 
     CUSTOMERS {
@@ -58,10 +58,10 @@ erDiagram
         int product_name_length
         int product_description_length
         int product_photos_qty
-        float product_weight_g
-        float product_length_cm
-        float product_height_cm
-        float product_width_cm
+        int product_weight_g
+        int product_length_cm
+        int product_height_cm
+        int product_width_cm
     }
 
     SELLERS {

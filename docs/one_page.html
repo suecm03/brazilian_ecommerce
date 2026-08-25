@@ -1,0 +1,405 @@
+<title>Três Alavancas de Receita</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --paper: #F3EEE1;
+    --panel: #FBF8F0;
+    --ink: #17251F;
+    --ink-soft: #B9AF95;
+    --accent: #B8842A;
+    --accent-deep: #8C6420;
+    --line: #CFC6AC;
+    --risk: #8B4636;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #2b2a26;
+    color: var(--ink);
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 28px 12px;
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    background: var(--paper);
+    position: relative;
+    padding: 34px 46px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 14px;
+  }
+
+  .heading-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 34px;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .contexto {
+    font-size: 12.5px;
+    color: var(--accent-deep);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    margin-top: 2px;
+  }
+
+  .alavancas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 17px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-height: 0;
+  }
+
+  .card-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+  }
+
+  .card h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 19px;
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .campo .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  .campo p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.42;
+    color: var(--ink);
+  }
+
+  .chart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 2px 0;
+  }
+
+  .chart-row svg { display: block; flex-shrink: 0; }
+
+  .chart-legenda {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9.5px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .chart-legenda .dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; }
+
+  .valor-bloco {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: 9px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .valor-bloco .valor {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 21px;
+    color: var(--accent-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .valor-bloco .valor-tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .risco {
+    font-size: 10.8px;
+    color: var(--risk);
+    line-height: 1.35;
+  }
+
+  .risco .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  footer {
+    border-top: 1.5px solid var(--ink);
+    padding-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .total-bloco {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+  }
+
+  .total-bloco .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  .total-bloco .numero {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 30px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .uplift-bloco {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--line);
+    padding-left: 30px;
+  }
+
+  .uplift-bloco .numero {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 36px;
+    color: var(--accent-deep);
+    line-height: 1;
+  }
+
+  .uplift-bloco .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  .fechamento {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 480px;
+  }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: var(--paper); padding: 0; }
+    .slide { box-shadow: none; }
+  }
+</style>
+
+<div class="slide">
+  <header>
+    <div class="heading-block">
+      <span class="eyebrow">Recomendação executiva · Olist</span>
+      <h1>Alavancas de receita para os próximos 6 meses</h1>
+      <span class="contexto">Quais são as alavancas mais efetivas para aumentar a receita nos próximos 6 meses?</span>
+    </div>
+  </header>
+
+  <div class="alavancas">
+
+    <div class="card">
+      <span class="card-num">Alavanca 01</span>
+      <h2>Reativação de clientes</h2>
+
+      <div class="campo">
+        <span class="label">Racional</span>
+        <p>94,5% da receita vem de cliente de compra única. Nem atraso nem satisfação mudam a recompra (~2% em 90 dias).</p>
+      </div>
+      <div class="campo">
+        <span class="label">Ação</span>
+        <p>Campanha segmentada clientes que compraram no último ano, com cupom personalizado, buscando reativação.</p>
+      </div>
+
+      <div class="chart-row">
+        <svg width="214" height="34" viewBox="0 0 214 34">
+          <rect x="6" y="0" width="196.6" height="34" fill="var(--accent)" />
+          <rect x="202.6" y="0" width="11.4" height="34" fill="var(--ink-soft)" />
+        </svg>
+      </div>
+      <span class="chart-legenda"><span class="dot" style="background:var(--accent)"></span>94,5% compra única &nbsp; <span class="dot" style="background:var(--ink-soft)"></span>5,5% recorrente</span>
+
+      <div class="campo">
+        <span class="label">Premissa</span>
+        <p>+2 p.p. na taxa de recompra, sobre 69.716 clientes de compra única nos últimos 12 meses do dataset.</p>
+      </div>
+
+      <div class="valor-bloco">
+        <span class="valor">R$ 192.221</span>
+        <span class="valor-tag">impacto em 6 meses</span>
+      </div>
+      <p class="risco"><span class="label">Risco </span>— alavanca se trata de uma reativação pontual, não fidelização. Outras campanhas para aumentar a retenção estrutural são necessárias, para além de 6 meses.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-num">Alavanca 02</span>
+      <h2>Prontidão para a Black Friday</h2>
+
+      <div class="campo">
+        <span class="label">Racional</span>
+        <p>24/11/2017 faturou R$ 149,9 mil, 3 a 5x os dias ao redor. Dado até ago/2018, então a BF está na janela de 6 meses.</p>
+      </div>
+      <div class="campo">
+        <span class="label">Ação</span>
+        <p>Realizar preparativos para a Black Friday, incluindo estoque e organização e capacitação dos vendedores para o evento.</p>
+      </div>
+
+      <div class="chart-row">
+        <svg width="211" height="82" viewBox="0 0 211 82">
+          <rect x="6" y="67.8" width="10" height="10.2" fill="var(--ink-soft)" />
+          <rect x="19" y="65.4" width="10" height="12.6" fill="var(--ink-soft)" />
+          <rect x="32" y="65.0" width="10" height="13.0" fill="var(--ink-soft)" />
+          <rect x="45" y="67.7" width="10" height="10.3" fill="var(--ink-soft)" />
+          <rect x="58" y="69.0" width="10" height="9.0" fill="var(--ink-soft)" />
+          <rect x="71" y="58.3" width="10" height="19.7" fill="var(--ink-soft)" />
+          <rect x="84" y="62.8" width="10" height="15.2" fill="var(--ink-soft)" />
+          <rect x="97" y="67.1" width="10" height="10.9" fill="var(--ink-soft)" />
+          <rect x="110" y="58.4" width="10" height="19.6" fill="var(--ink-soft)" />
+          <rect x="123" y="10.0" width="10" height="68.0" fill="var(--accent)" />
+          <rect x="136" y="50.8" width="10" height="27.2" fill="var(--ink-soft)" />
+          <rect x="149" y="58.0" width="10" height="20.0" fill="var(--ink-soft)" />
+          <rect x="162" y="56.6" width="10" height="21.4" fill="var(--ink-soft)" />
+          <rect x="175" y="56.4" width="10" height="21.6" fill="var(--ink-soft)" />
+          <rect x="188" y="60.3" width="10" height="17.7" fill="var(--ink-soft)" />
+          <rect x="201" y="64.0" width="10" height="14.0" fill="var(--ink-soft)" />
+          <line x1="0" y1="78" x2="211" y2="78" stroke="var(--line)" stroke-width="1" />
+        </svg>
+        <span class="chart-legenda"><span class="dot" style="background:var(--accent)"></span>24/11<br><span class="dot" style="background:var(--ink-soft)"></span>demais dias</span>
+      </div>
+
+      <div class="campo">
+        <span class="label">Premissa</span>
+        <p>10% da venda do pico que se perderia por ruptura de estoque/operação é evitada com o preparo.</p>
+      </div>
+
+      <div class="valor-bloco">
+        <span class="valor">R$ 129.838</span>
+        <span class="valor-tag">impacto no pico</span>
+      </div>
+      <p class="risco"><span class="label">Risco </span>— só 1 ano de Black Friday no histórico; % de perda evitada é premissa, não medição.</p>
+    </div>
+
+    <div class="card">
+      <span class="card-num">Alavanca 03</span>
+      <h2>Desconto por quantidade</h2>
+
+      <div class="campo">
+        <span class="label">Racional</span>
+        <p>Cliente já compra o mesmo item em quantidade: ticket sobe de R$ 130,57 (1 item) pra R$ 205,96 (2+ itens) por pedido.</p>
+      </div>
+      <div class="campo">
+        <span class="label">Ação</span>
+        <p>Desconto por volume (ex.: leve 3, pague 2) nas categorias onde esse padrão já é mais forte.</p>
+      </div>
+
+      <div class="chart-row">
+        <svg width="132" height="82" viewBox="0 0 132 82">
+          <rect x="20" y="34.9" width="34" height="43.1" fill="var(--ink-soft)" />
+          <rect x="78" y="10.0" width="34" height="68.0" fill="var(--accent)" />
+          <line x1="0" y1="78" x2="132" y2="78" stroke="var(--line)" stroke-width="1" />
+        </svg>
+        <span class="chart-legenda"><span class="dot" style="background:var(--ink-soft)"></span>1 item<br>R$ 130,57<br><span class="dot" style="background:var(--accent)"></span>2+ itens<br>R$ 205,96</span>
+      </div>
+
+      <div class="campo">
+        <span class="label">Premissa</span>
+        <p>5% dos pedidos de 1 item (jun–ago/18: ~5.615/mês) convertidos para 2+ itens com o incentivo, por 6 meses.</p>
+      </div>
+
+      <div class="valor-bloco">
+        <span class="valor">R$ 127.002</span>
+        <span class="valor-tag">impacto em 6 meses</span>
+      </div>
+      <p class="risco"><span class="label">Risco </span>— correlação observada, não causalidade; validar como teste controlado antes de escalar.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="total-bloco">
+      <span class="label">Impacto total estimado</span>
+      <span class="numero">R$ 449.062</span>
+    </div>
+    <div class="uplift-bloco">
+      <span class="numero">+8,3%</span>
+      <span class="label">uplift sobre a receita real dos últimos 6 meses (R$ 5,39M)</span>
+    </div>
+    <p class="fechamento">As três se complementam: reativação ataca a base de clientes que hoje só compra uma vez; Black Friday e kits atacam o ticket médio no curto prazo.</p>
+  </footer>
+</div>

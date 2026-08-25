@@ -2,16 +2,6 @@
 
 Projeto de analytics engineering ponta a ponta usando o dataset público de e-commerce brasileiro da Olist, para entender quais são as alavancas mais efetivas para aumentar a receita nos próximos 6 meses. O projeto cobre modelagem de dados, qualidade de dados, um pipeline ETL/ELT reprodutível, análise exploratória, automação com IA e uma recomendação executiva.
 
-## Escopo do Projeto
-
-| Etapa | Entregável | Status |
-| --- | --- | --- |
-| Modelagem de Dados | Modelo dimensional e ERD | Concluído |
-| Qualidade de Dados | Suite de validação automatizada | Pendente |
-| Pipeline de Dados | Pipeline reprodutível (Python + DuckDB + dbt) | Pendente |
-| Análise Exploratória | Resposta às 5 perguntas de negócio | Pendente |
-| Automação com IA | Classificação de reviews via LLM | Pendente |
-| Recomendação de Negócio | One-pager executivo | Pendente |
 
 ## Arquitetura
 
@@ -57,7 +47,7 @@ O pipeline roda localmente, sem servidor de banco de dados nem infraestrutura ex
 | Pytest | Testes automatizados |
 | Jupyter | Exploração e análise |
 | Matplotlib / Seaborn | Visualização |
-| LLM (a definir) | Automação com IA |
+| Transformers (Hugging Face) | Classificador de sentimento (BERT multilíngue) e LLM leve (Qwen2.5), rodando localmente |
 
 ## Fonte de Dados
 
@@ -85,22 +75,25 @@ O ERD completo, com todas as colunas, cardinalidades e chaves compostas, está e
 - **Constelação de fatos, não um fato único:** existe mais de um processo de negócio mensurável (venda de item, pagamento), cada um com sua própria medida.
 - **`order_items` contém apenas itens reais:** pedidos sem item (majoritariamente cancelados ou indisponíveis) não geram linha nessa tabela. A tabela `orders` é a fonte completa para qualquer pergunta sobre todos os pedidos.
 - **`customer_unique_id` para análises de cliente, `customer_id` para o grão da dimensão:** o endereço do cliente muda entre pedidos, então a dimensão `customers` é mantida no grão de `customer_id`; `customer_unique_id` é preservado como coluna para identificar recorrência (CLV, recompra).
-- **Receita definida na camada de análise, não no pipeline:** apenas pedidos `delivered` contam como receita; os demais status permanecem nos dados para auditoria ou uma definição alternativa.
 - **`payments` e `reviews` mantidas na granularidade original:** preservar o detalhe de pagamento e o texto das reviews é necessário para análises mais qualitativas, como de análise de sentimento.
-- **DuckDB e dbt em vez de um banco com servidor:** roda localmente a partir de um arquivo, sem infraestrutura ou configuração adicional, adequado ao prazo do case.
 - **Geolocalização e tradução de categoria fora do modelo:** `customers` e `sellers` já trazem cidade e estado; a tradução de categoria não é necessária para o público da análise.
 
 ## Qualidade de Dados
 
-Achados detalhados de qualidade de dados (nulos, duplicatas, outliers, integridade referencial, inconsistências temporais) são documentados no Data Quality Report, com checagens automatizadas e saída pass/fail (etapa pendente).
+Testes automatizados no dbt cobrem nulos, duplicatas, integridade referencial, outliers e inconsistências temporais, aplicados sobre os models de mart. Achados conhecidos e não bloqueantes ficam marcados como `warn`; o restante quebra o build em caso de falha. O resultado consolidado, com saída pass/fail, está em [`notebooks/data_quality_report.ipynb`](notebooks/data_quality_report.ipynb).
 
 ## Análise de Negócio
 
-A análise responde a cinco perguntas de negócio: sazonalidade de vendas, categorias mais rentáveis, impacto da entrega na recompra, CLV por região, e concentração de vendas por vendedor. A análise detalhada e as visualizações estarão no notebook de análise exploratória (etapa pendente).
+A análise responde a cinco perguntas de negócio, sendo elas: categorias mais rentáveis, sazonalidade de vendas, impacto da entrega na recompra, CLV por região e concentração de receita entre vendedores. Além de outras três alavancas adicionais investigadas (itens por pedido, mix de cliente novo vs. recorrente, satisfação e recompra) e uma seção final de estimativa de impacto financeiro (R$ e % de uplift) para as alavancas priorizadas. Todas as queries, gráficos e decisões documentadas estão em [`notebooks/analise_exploratoria.ipynb`](notebooks/analise_exploratoria.ipynb).
 
 ## Automação com IA
 
-Componente de IA voltado a um problema analítico concreto, não a um chatbot de demonstração. O texto das reviews foi preservado no modelo especificamente para viabilizar essa etapa (por exemplo, classificação de sentimento das avaliações). Implementação e justificativa da abordagem escolhida serão documentadas separadamente (etapa pendente).
+Dois modelos open source, gratuitos e executados localmente, dentro do `.venv` do projeto:
+
+- Um classificador de sentimento (BERT multilíngue) roda em todas as ~41 mil reviews com texto e prevê uma nota de 1 a 5 a partir do texto. A diferença absoluta entre essa nota e a nota real (`review_score`) mede, de forma determinística e para a população inteira, o quanto texto e nota divergem.
+- Um LLM (Qwen2.5-1.5B-Instruct) classifica os casos de maior divergência numa lista fixa de ~20 categorias (ex.: atraso na entrega, produto com defeito, elogio geral), como camada de leitura rápida e reduzindo o esforço de triagem de atendimento, sem exigir leitura manual de cada review.
+
+ Ver [`notebooks/automacao_ia_sentimento.ipynb`](notebooks/automacao_ia_sentimento.ipynb).
 
 ## Reprodutibilidade
 
@@ -111,12 +104,44 @@ Criação do ambiente virtual e instalação das dependências:
 ```bash
 python -m venv .venv
 source .venv/Scripts/activate  # Git Bash no Windows
+pip install torch --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 ```
 
 O dataset deve ser baixado em https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce, extraído e posicionado em `data/raw/`.
 
-Execução do pipeline, dos testes (`pytest`) e do dbt: instruções serão adicionadas quando essas etapas estiverem implementadas.
+Pra rodar o projeto inteiro do zero sem precisar executar cada etapa manualmente, existe `run_pipeline.py`, que chama ingestão, dbt, testes e os notebooks (menos o de IA, que é opcional) em sequência, parando com uma mensagem clara se algum passo falhar:
+
+```bash
+python run_pipeline.py
+python run_pipeline.py --com-ia  # inclui a automação com IA (~25min na 1ª vez)
+```
+
+As etapas abaixo são o mesmo pipeline, uma por vez — úteis pra rodar ou depurar uma etapa isolada.
+
+Ingestão dos CSVs no DuckDB (a partir da raiz do projeto):
+
+```bash
+python src/ingest.py
+```
+
+Execução do dbt (staging, marts e testes). O comando precisa ser rodado de dentro de `dbt_project/`, porque o caminho do banco em `profiles.yml` é relativo ao diretório de onde o comando é chamado, não ao projeto:
+
+```bash
+cd dbt_project
+dbt build
+cd ..
+```
+
+Testes do pipeline de ingestão:
+
+```bash
+pytest
+```
+
+O Data Quality Report roda o `dbt build` internamente e apresenta o resultado; basta abrir e executar `notebooks/data_quality_report.ipynb`.
+
+A análise exploratória está em `notebooks/analise_exploratoria.ipynb`. A automação com IA está em `notebooks/automacao_ia_sentimento.ipynb`; na primeira execução, o classificador de sentimento leva cerca de 25 minutos (roda em CPU, sobre ~41 mil reviews) e o resultado fica em cache (`data/processed/sentiment_scores.parquet` e `sentiment_llm_categoria_top.parquet`), então reexecuções são quase instantâneas. Para forçar reprocessamento, basta apagar esses dois arquivos de cache.
 
 ## Estrutura do Repositório
 
@@ -132,8 +157,4 @@ docs/              ERD e documentação complementar
 
 ## Resultados
 
-A recomendação executiva, com as alavancas de receita priorizadas, estará disponível como one-pager ao final do projeto (etapa pendente).
-
-## Melhorias Futuras
-
-Fora do escopo deste case, mas consideradas como evolução natural: orquestração do pipeline, integração com CI/CD, modelos incrementais no dbt, observabilidade de dados, ingestão automatizada via API do Kaggle, e modelos adicionais de segmentação de cliente.
+A recomendação executiva, com as três alavancas de receita priorizadas para os próximos 6 meses e o impacto financeiro estimado de cada uma, está em [`docs/recomendacao_executiva.md`](docs/recomendacao_executiva.md). Uma versão visual, em formato de slide está em [`docs/one_page.html`](docs/one_page.html) na versão HTML e, no mesmo local, com versão PDF.

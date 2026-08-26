@@ -17,7 +17,6 @@ logs/
 # dados (baixados ou gerados via script, não versionados)
 *.csv
 *.duckdb
-*.parquet
 
 .user.yml
 

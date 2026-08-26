@@ -47,7 +47,7 @@ O pipeline roda localmente, sem servidor de banco de dados nem infraestrutura ex
 | Pytest | Testes automatizados |
 | Jupyter | Exploração e análise |
 | Matplotlib / Seaborn | Visualização |
-| Transformers (Hugging Face) | Classificador de sentimento (BERT multilíngue) e LLM leve (Qwen2.5), rodando localmente |
+| Transformers (Hugging Face) | Classificador de sentimento (BERT multilíngue), rodando localmente |
 
 ## Fonte de Dados
 
@@ -88,46 +88,45 @@ A análise responde a cinco perguntas de negócio, sendo elas: categorias mais r
 
 ## Automação com IA
 
-Dois modelos open source, gratuitos e executados localmente, dentro do `.venv` do projeto:
+Um modelo open source, gratuito e executado localmente, dentro do `.venv` do projeto: um classificador de sentimento (BERT multilíngue) roda em todas as ~41 mil reviews com texto e prevê uma nota de 1 a 5 a partir do texto. A diferença absoluta entre essa nota e a nota real (`review_score`) mede, de forma determinística e para a população inteira, o quanto texto e nota divergem.
 
-- Um classificador de sentimento (BERT multilíngue) roda em todas as ~41 mil reviews com texto e prevê uma nota de 1 a 5 a partir do texto. A diferença absoluta entre essa nota e a nota real (`review_score`) mede, de forma determinística e para a população inteira, o quanto texto e nota divergem.
-- Um LLM (Qwen2.5-1.5B-Instruct) classifica os casos de maior divergência numa lista fixa de ~20 categorias (ex.: atraso na entrega, produto com defeito, elogio geral), como camada de leitura rápida e reduzindo o esforço de triagem de atendimento, sem exigir leitura manual de cada review.
+O resultado fica em cache (`data/processed/sentiment_scores.parquet`), então reexecuções são quase instantâneas. Pra gerar do zero, basta apagar esse arquivo antes de rodar o notebook de novo.
 
- Ver [`notebooks/automacao_ia_sentimento.ipynb`](notebooks/automacao_ia_sentimento.ipynb).
+Ver [`notebooks/automacao_ia_sentimento.ipynb`](notebooks/automacao_ia_sentimento.ipynb).
 
 ## Reprodutibilidade
 
 Pré-requisitos: Python 3.14+, Git.
 
-Criação do ambiente virtual e instalação das dependências:
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate  # Git Bash no Windows (Powershell: ".venv\scripts\Activate")
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install -r requirements.txt
-```
-
 O dataset deve ser baixado em https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce, extraído e posicionado em `data/raw/`.
 
-Pra rodar o projeto inteiro do zero sem precisar executar cada etapa manualmente, existe `run_pipeline.py`, que chama ingestão, dbt, testes e os notebooks (menos o de IA, que é opcional) em sequência, parando com uma mensagem clara se algum passo falhar:
+Criação do ambiente virtual, instalação das dependências e execução do pipeline completo:
 
-```bash
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
 python run_pipeline.py
-python run_pipeline.py --com-ia  # inclui a automação com IA (~25min na 1ª vez)
 ```
 
-As etapas abaixo são o mesmo pipeline, uma por vez — úteis pra rodar ou depurar uma etapa isolada.
+Pra incluir a automação com IA (~25min na 1ª vez, depois fica em cache), troque a última linha por:
+
+```powershell
+python run_pipeline.py --com-ia
+```
+
+As etapas abaixo são o mesmo pipeline, uma por vez, caso precise rodar ou depurar uma etapa isolada.
 
 Ingestão dos CSVs no DuckDB (a partir da raiz do projeto):
 
-```bash
+```powershell
 python src/ingest.py
 ```
 
 Execução do dbt (staging, marts e testes). O comando precisa ser rodado de dentro de `dbt_project/`, porque o caminho do banco em `profiles.yml` é relativo ao diretório de onde o comando é chamado, não ao projeto:
 
-```bash
+```powershell
 cd dbt_project
 dbt build
 cd ..
@@ -135,13 +134,13 @@ cd ..
 
 Testes do pipeline de ingestão:
 
-```bash
+```powershell
 pytest
 ```
 
 O Data Quality Report roda o `dbt build` internamente e apresenta o resultado; basta abrir e executar `notebooks/data_quality_report.ipynb`.
 
-A análise exploratória está em `notebooks/analise_exploratoria.ipynb`. A automação com IA está em `notebooks/automacao_ia_sentimento.ipynb`; na primeira execução, o classificador de sentimento leva cerca de 25 minutos (roda em CPU, sobre ~41 mil reviews) e o resultado fica em cache (`data/processed/sentiment_scores.parquet` e `sentiment_llm_categoria_top.parquet`), então reexecuções são quase instantâneas. Para forçar reprocessamento, basta apagar esses dois arquivos de cache.
+A análise exploratória está em `notebooks/analise_exploratoria.ipynb`. A automação com IA está em `notebooks/automacao_ia_sentimento.ipynb`; na primeira execução, o classificador de sentimento leva cerca de 25 minutos (roda em CPU, sobre ~41 mil reviews).
 
 ## Estrutura do Repositório
 
